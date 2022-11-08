@@ -1,10 +1,8 @@
 const mongoose=require("mongoose")
 const studentModel = require('../Models/studentMod');
-const prompt = require("prompt-sync")
-//const input = ps()
+
 const Toastify=require('toastify-js')
 
-const alert=require("alert")
 
 
 //const validator = require('email-validator');
@@ -81,6 +79,22 @@ const isValid = function (value) {
         }
     }
 
+    module.exports.getStudents=async function(req,res){
+      try {
+        let q = req.query
+        q.isDeleted=false
+
+        const data = await studentModel.find(q);
+        // console.log(data)
+        if (data.length == 0) return res.status(404).send({ status: false, msg: "No student record found" });
+
+        res.status(200).send({ status: true, data: data })
+    } catch (err) {
+        res.status(500).send({ status: false, msg: err.message });
+    }
+  }
+
+
     module.exports.updateStudent=async function(req,res){
       try{
       let data=req.body
@@ -89,7 +103,7 @@ const isValid = function (value) {
       if (!isValidObjectId(studentId)) {
         return res.status(400).send({ status: false, message: "StudentId is in invalid format." })}
       
-      if(!await studentModel.findById({_id:studentId})){
+      if(await studentModel.findById({_id:studentId,isDeleted:true})){
         return res.status(404).send({status:false, msg: "Such student not exist"})
       }
      
@@ -148,7 +162,7 @@ res.status(500).send({ status: false, msg: "Error", error: err.message })
 module.exports.delete = async function (req, res) {
   try {
     
-     Window.prompt("jfjf","64")
+    
 
       // let findStudent = await studentModel.find( data )
       // if ( findStudent.length === 0 ) return res.status(400).send({ status: false, msg: "No such student found to delete." })
@@ -159,3 +173,4 @@ module.exports.delete = async function (req, res) {
       return res.status(500).send({ status: false, message: err.message })
   }
 }
+

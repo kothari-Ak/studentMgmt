@@ -1,6 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const route = require("./route")
+const route = require("../studentMgmt/route")
 const  mongoose  = require("mongoose");
 const app = express();
 

@@ -2,6 +2,8 @@
   "dependencies": {
     "express": "^4.18.2",
     "mongoose": "^6.7.2",
-    "nodemon": "^2.0.20"
+    "nodemon": "^2.0.20",
+    "toastify": "^2.0.1",
+    "toastify-js": "^1.12.0"
   }
 }
