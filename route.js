@@ -4,11 +4,10 @@ const router = express.Router();
 
 const studentController=require("../studentMgmt/controller/studentCon")
 
-router.post("/register", studentController.createStudent)
+router.post("/create", studentController.createStudent)
 router.put("/students/:studentId", studentController.updateStudent)
-router.get("/students/", studentController.getStudents)
+router.get("/getstudents/", studentController.getStudents)
 
-//router.delete("/students/:studentId", studentController.deleteStudentbyId)
 //router.delete("/students/", studentController.delete)
 
 module.exports=router

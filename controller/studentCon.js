@@ -72,7 +72,7 @@ const isValid = function (value) {
             }
             let Student= await studentModel.create(data)
             let savedData = await studentModel.findOne(Student)
-            res.status(201).send({ status: true, msg: "Student Registered Successfully ✅✅", data: savedData })
+            res.status(200).send({ status: true, msg: "Student Added Successfully ✅✅", data: savedData })
         }
         catch (error) {
             res.status(500).send({ status: false, error: error.message })
@@ -103,9 +103,6 @@ const isValid = function (value) {
       if (!isValidObjectId(studentId)) {
         return res.status(400).send({ status: false, message: "StudentId is in invalid format." })}
       
-      if(await studentModel.findById({_id:studentId,isDeleted:true})){
-        return res.status(404).send({status:false, msg: "Such student not exist"})
-      }
      
       if (Object.keys(data).length == 0) {
         return res.status(400).send({ status: false, msg: "Body should not be Empty.. " })
@@ -144,13 +141,16 @@ if(data.Email){
         }
     }
 
-    let student = await studentModel.findOneAndUpdate({_id:studentId},
+    let student = await studentModel.findOneAndUpdate({_id:studentId,isDeleted:false},
       {
         $set: { Name:data.Name, Age:data.Age, Mobile: data.Mobile, Email:data.Email}
    },
    {new : true});
 
-res.status(200).send({ status: true, data: student});
+   if (!student) {
+    return res.status(404).send({ status: false, msg: "No such student exists" })};   
+
+res.status(200).send({ status: true, msg:"Student details updated successfully", data: student});
 }
 catch (err) {
 res.status(500).send({ status: false, msg: "Error", error: err.message })
