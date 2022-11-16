@@ -1,11 +1,6 @@
 const mongoose=require("mongoose")
 const studentModel = require('../Models/studentMod');
 
-const Toastify=require('toastify-js')
-
-
-
-//const validator = require('email-validator');
 
 let mobileRegex = /^(?:(?:\+|0{0,2})91(\s*[\-]\s*)?|[0]?)?[6789]\d{9}$/
 
@@ -38,7 +33,7 @@ const isValid = function (value) {
     module.exports.createStudent= async function (req, res) {
         try { 
           let data = req.body 
-         const { Name, Age, Mobile, Email} = data;
+         const { Name, Age, Mobile, Email,isDeleted} = data;
          
               if ( !isValid ( Name) ){return res.status(400).send({status:false, msg:"Enter valid Name."})} 
               if ( !isvalid ( Age ) ) {return res.status(400).send({status:false, msg:"Enter valid Age."})}
@@ -95,82 +90,88 @@ const isValid = function (value) {
   }
 
 
-    module.exports.updateStudent=async function(req,res){
-      try{
-      let data=req.body
-      let studentId=req.params.studentId    
+module.exports.updateStudent=async function(req,res){
+    try{
+    let data=req.body
+    let studentId=req.params.studentId    
 
-      if (!isValidObjectId(studentId)) {
-        return res.status(400).send({ status: false, message: "StudentId is in invalid format." })}
-      
-     
-      if (Object.keys(data).length == 0) {
-        return res.status(400).send({ status: false, msg: "Body should not be Empty.. " })
-      }
-      if(data.Name){
-      if ( !isValid ( data.Name) ){return res.status(400).send({status:false, msg:"Enter valid Name."})} }
-      
-      if(data.Age){
-      if ( !isvalid ( data.Age ) ) {return res.status(400).send({status:false, msg:"Enter valid Age."})}}
-        
-      
-      if(data.Mobile){
-        if ( !isValid ( data.Mobile) ){return res.status(400).send({status:false, msg:"Enter valid mobile."})} 
-      if (!mobileRegex.test(data.Mobile)) {
-        return res.status(400).send({ Status: false, message: "Please enter valid Indian mobile number ⚠️⚠️" })
-    }
+    if (!isValidObjectId(studentId)) {
+      return res.status(400).send({ status: false, message: "StudentId is in invalid format." })}
     
-        let checkmobile = await studentModel.findOne({ Mobile: data.Mobile })
-
-        if (checkmobile) {
-            return res.status(400).send({ Status: false, message: "Please provide another number, this number has been used ⚠️⚠️" })
-        }
+   
+    if (Object.keys(data).length == 0) {
+      return res.status(400).send({ status: false, msg: "Body should not be Empty.. " })
     }
-if(data.Email){
-    if ( !isValid ( data.Email ) ) {res.status(400).send({status:false, msg:"Enter valid Email."})}
-
-    if (!emailRegex.test(Email)) {
-        return res.status(400).send({ Status: false, message: "Please enter valid email ⚠️⚠️" })
-    }
-
+    if(data.Name){
+    if ( !isValid ( data.Name) ){return res.status(400).send({status:false, msg:"Enter valid Name."})} }
+    
+    if(data.Age){
+    if ( !isvalid ( data.Age ) ) {return res.status(400).send({status:false, msg:"Enter valid Age."})}}
+      
+    
+    if(data.Mobile){
+      if ( !isValid ( data.Mobile) ){return res.status(400).send({status:false, msg:"Enter valid mobile."})} 
+    if (!mobileRegex.test(data.Mobile)) {
+      return res.status(400).send({ Status: false, message: "Please enter valid Indian mobile number ⚠️⚠️" })
+  }
   
-        let checkemail = await studentModel.findOne({ Email: data.Email })
+      let checkmobile = await studentModel.findOne({ Mobile: data.Mobile })
 
-        if (checkemail) {
-            return res.status(400).send({ Status: false, message: "Please provide another email, this email has been used ⚠️⚠️" })
-        }
-    }
+      if (checkmobile) {
+          return res.status(400).send({ Status: false, message: "Please provide another number, this number has been used ⚠️⚠️" })
+      }
+  }
+if(data.Email){
+  if ( !isValid ( data.Email ) ) {res.status(400).send({status:false, msg:"Enter valid Email."})}
 
-    let student = await studentModel.findOneAndUpdate({_id:studentId,isDeleted:false},
-      {
-        $set: { Name:data.Name, Age:data.Age, Mobile: data.Mobile, Email:data.Email}
-   },
-   {new : true});
+  if (!emailRegex.test(Email)) {
+      return res.status(400).send({ Status: false, message: "Please enter valid email ⚠️⚠️" })
+  }
 
-   if (!student) {
-    return res.status(404).send({ status: false, msg: "No such student exists" })};   
+
+      let checkemail = await studentModel.findOne({ Email: data.Email })
+
+      if (checkemail) {
+          return res.status(400).send({ Status: false, message: "Please provide another email, this email has been used ⚠️⚠️" })
+      }
+  }
+
+  let student = await studentModel.findOneAndUpdate({_id:studentId,isDeleted:false},
+    {
+      $set: { Name:data.Name, Age:data.Age, Mobile: data.Mobile, Email:data.Email}
+ },
+ {new : true});
+
+ if (!student) {
+  return res.status(404).send({ status: false, msg: "No such student exists" })};   
 
 res.status(200).send({ status: true, msg:"Student details updated successfully", data: student});
 }
 catch (err) {
 res.status(500).send({ status: false, msg: "Error", error: err.message })
 }
-  }
-
-
-
-module.exports.delete = async function (req, res) {
-  try {
-    
-    
-
-      // let findStudent = await studentModel.find( data )
-      // if ( findStudent.length === 0 ) return res.status(400).send({ status: false, msg: "No such student found to delete." })
-
-      // let deleted = await studentModel.updateMany( data, { isDeleted: true }, { new: true } )
-      // return res.status(200).send({ status: true, data: deleted })
-  } catch (err) {
-      return res.status(500).send({ status: false, message: err.message })
-  }
 }
 
+
+module.exports.deleteStudent=async function(req,res){
+  try{
+  let delQueryData = req.query;
+      
+  const { Mobile } = delQueryData;
+
+  if(Object.keys(delQueryData)==0){
+    return res.status(400).send({status:false, message: "please provide the mobile number of the student which you want to delete"})
+  }
+  const findStudent = await studentModel.find({delQueryData})
+  
+
+if (findStudent.length==0 || {isDeleted:true}) {
+  return res.status(404).send({ status: false, message: "No Student found" });
+}
+  await studentModel.findOneAndUpdate(delQueryData,{$set:{isDeleted:true}})
+return res.status(200).send({ status: true, message: "student successfully deleted"});
+}
+  catch (error) {
+    res.status(500).send({ status: false, message: error.message });
+  }
+}

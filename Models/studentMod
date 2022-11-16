@@ -8,14 +8,13 @@ const studentSchema = new mongoose.Schema({
         trim:true
         },
         Age:{
-            type:Number,
+            type:String,
             required:true
         },
         Mobile:{
             type:String,
             unique:true,
-            required:true,
-            trim:true
+            required:true
         },
         Email:{
             type:String,
@@ -28,6 +27,7 @@ const studentSchema = new mongoose.Schema({
             default:false
         }
     },
+
         {timestamps:true});
     
     module.exports = mongoose.model("Project_students", studentSchema);
