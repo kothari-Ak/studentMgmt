@@ -1,5 +1,5 @@
 "use strict";
-const urlencoded = require("whatwg-url/lib/urlencoded");
+const urlencoded = require("./urlencoded");
 
 exports.implementation = class URLSearchParamsImpl {
   constructor(globalObject, constructorArgs, { doNotStripQMark = false }) {
