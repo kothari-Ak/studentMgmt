@@ -10,10 +10,7 @@ let mobileRegex = /^(?:(?:\+|0{0,2})91(\s*[\-]\s*)?|[0]?)?[6789]\d{9}$/
 
 let emailRegex = /^[a-z]{1}[a-z0-9._]{1,100}[@]{1}[a-z]{2,15}[.]{1}[a-z]{2,10}$/
 
-let validatePassword = (password) => {
-  var pass = /^(?=.*?[A-Za-z0-9#?!@$%^&*-]).{8,15}$/
-  return pass.test(password)
-}
+
 
 const isValid = function (value) {
     if( typeof value == 'string' && value.trim().length == 0 ) {
@@ -92,7 +89,7 @@ const isValid = function (value) {
             
             
   let notShowed = {
-    Password:0,
+    
     createdAt:0,
     updatedAt:0,
     isDeleted:0,
@@ -109,6 +106,11 @@ const isValid = function (value) {
         catch (error) {
             res.status(500).send({ status: false, error: error.message})
         }
+    }
+
+    let validatePassword = (password) => {
+      var pass = /^(?=.*?[A-Za-z0-9#?!@$%^&*-]).{8,15}$/
+      return pass.test(password)
     }
 
     module.exports.loginStudent = async function (req, res) {

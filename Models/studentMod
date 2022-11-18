@@ -23,10 +23,7 @@ const studentSchema = new mongoose.Schema({
             required:true,
             trim:true
         },
-        Password:{
-            type:String,
-            required:true
-        },
+
         isDeleted:{
             type:Boolean,
             default:false
