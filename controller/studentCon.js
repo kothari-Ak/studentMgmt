@@ -2,6 +2,8 @@ const mongoose=require("mongoose")
 const jwt = require("jsonwebtoken")
 
 const studentModel = require('../Models/studentMod');
+const logStudMod = require("../Models/loginMod")
+
 
 
 let mobileRegex = /^(?:(?:\+|0{0,2})91(\s*[\-]\s*)?|[0]?)?[6789]\d{9}$/
@@ -52,13 +54,13 @@ const isValid = function (value) {
     module.exports.createStudent= async function (req, res) {
         try { 
           let data = req.body 
-         const { Name, Age, Mobile, Email, Password, isDeleted  } = data;
+         const { Name, Age, Mobile, Email, isDeleted  } = data;
          
               if ( !isValid ( Name) ){return res.status(400).send({status:false, msg:"Enter valid Name."})} 
               if ( !isvalid ( Age ) ) {return res.status(400).send({status:false, msg:"Enter valid Age."})}
               if ( !isValid ( Mobile) ) {return res.status(400).send({status:false, msg:"Enter valid mobile number"})}
               if ( !isValid ( Email ) ) {res.status(400).send({status:false, msg:"Enter valid Email."})}
-              if (!validBody(Password)) { return res.status(400).send({ status: false, message: "enter the password" }) }
+             
               
               if (Object.keys(data).length == 0) {
                 return res.status(400).send({ status: false, msg: "Body should not be Empty.. " })
@@ -86,9 +88,7 @@ const isValid = function (value) {
                 }
             }
              
-            if(Password){
-              if (!validatePassword(Password)) { return res.status(400).send({ status: false, msg: "enter valid password" }) }
-            }
+        
             
             
   let notShowed = {
@@ -114,10 +114,19 @@ const isValid = function (value) {
     module.exports.loginStudent = async function (req, res) {
       try {
         let data=req.body
-      let{Name,Password}=data
+      let{userName,password, }=data
     
-      if(Object.keys(data).length<=1){ return res.status(400).send({ status: false, message: "required details (email and password) are missing" })}
-        let student = await studentModel.findOne({Name:Name, Password:Password});
+      if (Object.keys(data).length == 0) {
+        return res.status(400).send({ status: false, msg: "Body should not be Empty.. " })
+    }
+       if(!userName) {return res.status(400).send({status:false, msg:"please enter the user name."})} 
+       if ( !isValid ( userName) ){return res.status(400).send({status:false, msg:"Enter valid Name."})} 
+       if (!validBody(password)) { return res.status(400).send({ status: false, message: "enter the password" }) }
+    
+       if(password){
+        if (!validatePassword(password)) { return res.status(400).send({ status: false, msg: "enter valid password" }) }
+      }
+        let student = await logStudMod.findOne({userName:userName, password:password});
         if (!student)
           return res.status(400).send({
             status: false, msg: "username or password is not correct",
@@ -147,7 +156,6 @@ const isValid = function (value) {
         q.isDeleted=false
 
         let notShowed = {
-          Password:0,
           createdAt:0,
           updatedAt:0,
           isDeleted:0,
@@ -215,7 +223,7 @@ if(data.Email){
   }
 
   let notShowed = {
-   Password:0,
+
    createdAt:0,
    updatedAt:0,
    isDeleted:0,
@@ -266,4 +274,31 @@ return res.status(200).send({ status: true, DeletedAt: date.toLocaleString(), me
   catch (error) {
     res.status(500).send({ status: false, message: error.message });
   }
+}
+
+module.exports.loginDatabase= async function (req, res) {
+  try { 
+    let data = req.body 
+   const { userName ,password} = data;
+
+   if (Object.keys(data).length == 0) {
+    return res.status(400).send({ status: false, msg: "Body should not be Empty.. " })
+}
+   if(!userName) {return res.status(400).send({status:false, msg:"please enter the user name."})} 
+   if ( !isValid ( userName) ){return res.status(400).send({status:false, msg:"Enter valid Name."})} 
+   if (!validBody(password)) { return res.status(400).send({ status: false, message: "enter the password" }) }
+
+   if(password){
+    if (!validatePassword(password)) { return res.status(400).send({ status: false, msg: "enter valid password" }) }
+  }
+      
+
+ 
+  let Student= await logStudMod.create(data)
+ // let savedData = await logStudMod.findOne(Student).select({__v:0})
+  res.status(200).send({ status: true})
+}
+catch(error){
+  res.status(500).send({ status: false, error: error.message})
+}
 }
