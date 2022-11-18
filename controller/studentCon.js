@@ -258,25 +258,25 @@ module.exports.deleteStudent=async function(req,res){
   try{
   let delQueryData = req.query;
       
-  const {Mobile} = delQueryData;
+  const {Mobile}=delQueryData
 
   if(Object.keys(delQueryData)==0){
     return res.status(400).send({status:false, message: "please provide the mobile number of the student which you want to delete"})
   }
- const findStudent = await studentModel.find({delQueryData})
-  
-
-if (findStudent.length==0 || {isDeleted:true}) return res.status(404).send({ status: false, message: "No Student found" });
-
-  await studentModel.findOneAndUpdate({delQueryData},{$set:{isDeleted:true}},{new:true})
-
   let date= new Date
+
+const findStudent =await studentModel.findOneAndUpdate({delQueryData,isDeleted:false},{$set:{isDeleted:true},deletedAt:date},{new:true}).select({deletedAt:0})
+
+if(!findStudent ) return res.status(404).send({ status: false, message: "No Student found" })
+
+ 
 return res.status(200).send({ status: true, DeletedAt: date.toLocaleString(), message: "student successfully deleted"});
 }
   catch (error) {
     res.status(500).send({ status: false, message: error.message });
   }
 }
+
 
 module.exports.loginDatabase= async function (req, res) {
   try { 
