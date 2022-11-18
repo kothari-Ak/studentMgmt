@@ -243,21 +243,6 @@ res.status(500).send({ status: false, msg: "Error", error: err.message })
 
 
 
-// module.exports.systemLogs=async function(req,res){
-//   try {
-//     let q = req.query
-//     q.isDeleted=false
-
-//     const data = await studentModel.find({q}).select({Name:0, Age:0,Mobile:0, Email:0,Password:0, isDeleted:0,__v:0})
-//     // console.log(data)
-//     if (data.length == 0) return res.status(404).send({ status: false, msg: "No student record found" });
-     
-//     let date=new Date
-//     res.status(200).send({  lastSeen: date.toLocaleString(), data: data })
-// } catch (err) {
-//     res.status(500).send({ status: false, msg: err.message });
-// }
-// }
 
 module.exports.deleteStudent=async function(req,res){
   try{
