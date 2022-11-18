@@ -52,7 +52,7 @@ const isValid = function (value) {
     module.exports.createStudent= async function (req, res) {
         try { 
           let data = req.body 
-         const { Name, Age, Mobile, Email, Password, isDeleted, } = data;
+         const { Name, Age, Mobile, Email, Password, isDeleted  } = data;
          
               if ( !isValid ( Name) ){return res.status(400).send({status:false, msg:"Enter valid Name."})} 
               if ( !isvalid ( Age ) ) {return res.status(400).send({status:false, msg:"Enter valid Age."})}
@@ -89,11 +89,21 @@ const isValid = function (value) {
             if(Password){
               if (!validatePassword(Password)) { return res.status(400).send({ status: false, msg: "enter valid password" }) }
             }
+            
+            
+  let notShowed = {
+    Password:0,
+    createdAt:0,
+    updatedAt:0,
+    isDeleted:0,
+    deletedAt:0,
+    __v:0
+   };
 
             let Student= await studentModel.create(data)
-            let savedData = await studentModel.findOne(Student).select({Password:0})
+            let savedData = await studentModel.findOne(Student).select(notShowed)
             let date=new Date
-            res.status(200).send({ status: true, msg: "Student Added Successfully ✅✅" ,createdAt:date.toLocaleString() , data: savedData})
+            res.status(200).send({ status: true, msg: "Student Added Successfully ✅✅" ,CreatedAt:date.toLocaleString() , data: savedData})
         }
         
         catch (error) {
@@ -136,10 +146,21 @@ const isValid = function (value) {
         let q = req.query
         q.isDeleted=false
 
-        const data = await studentModel.find(q).select({Password:0})
+        let notShowed = {
+          Password:0,
+          createdAt:0,
+          updatedAt:0,
+          isDeleted:0,
+          deletedAt:0,
+          __v:0
+         };
+
+        const data = await studentModel.find(q).select(notShowed)
         // console.log(data)
         if (data.length == 0) return res.status(404).send({ status: false, msg: "No student record found" });
          
+      
+
         let date=new Date
         res.status(200).send({ status: true, lastSeen: date.toLocaleString(), data: data })
     } catch (err) {
@@ -193,24 +214,50 @@ if(data.Email){
       }
   }
 
+  let notShowed = {
+   Password:0,
+   createdAt:0,
+   updatedAt:0,
+   isDeleted:0,
+    deletedAt:0,
+   __v:0
+  };
+
   let student = await studentModel.findOneAndUpdate({_id:studentId,isDeleted:false},
     {
       $set: { Name:data.Name, Age:data.Age, Mobile: data.Mobile, Email:data.Email}
  },
- {new : true}).select({Password:0});
+ {new : true}).select(notShowed);
 
  if (!student) {
   return res.status(404).send({ status: false, msg: "No such student exists" })};   
 
   let date=new Date
 
-res.status(200).send({ status: true, msg:"Student details updated successfully", updatedAt: date.toLocaleString(), data: student});
+res.status(200).send({ status: true, msg:"Student details updated successfully", UpdatedAt: date.toLocaleString(), data: student});
 }
 catch (err) {
 res.status(500).send({ status: false, msg: "Error", error: err.message })
 }
 }
 
+
+
+// module.exports.systemLogs=async function(req,res){
+//   try {
+//     let q = req.query
+//     q.isDeleted=false
+
+//     const data = await studentModel.find({q}).select({Name:0, Age:0,Mobile:0, Email:0,Password:0, isDeleted:0,__v:0})
+//     // console.log(data)
+//     if (data.length == 0) return res.status(404).send({ status: false, msg: "No student record found" });
+     
+//     let date=new Date
+//     res.status(200).send({  lastSeen: date.toLocaleString(), data: data })
+// } catch (err) {
+//     res.status(500).send({ status: false, msg: err.message });
+// }
+// }
 
 module.exports.deleteStudent=async function(req,res){
   try{
@@ -235,4 +282,3 @@ return res.status(200).send({ status: true, DeletedAt: date.toLocaleString(), me
     res.status(500).send({ status: false, message: error.message });
   }
 }
-

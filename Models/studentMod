@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-let date=new Date()
+//let date=new Date
 
 const studentSchema = new mongoose.Schema({
     Name:{
@@ -30,8 +30,11 @@ const studentSchema = new mongoose.Schema({
         isDeleted:{
             type:Boolean,
             default:false
-        },    
-    },
+        }, 
+        
+    deletedAt: { type: Date, default: null },
+       
+    },{timestamps:true }
     )
     
     module.exports = mongoose.model("Project_students", studentSchema);
