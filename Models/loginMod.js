@@ -9,7 +9,10 @@ const loginSchema = new mongoose.Schema({
         },
         password:{
             type:String,
-            required:true
-        },})
+            required:true,
+           
+        },
+
+    })
 
         module.exports = mongoose.model("login_students", loginSchema);

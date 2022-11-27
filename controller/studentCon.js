@@ -3,6 +3,8 @@ const jwt = require("jsonwebtoken");
 
 const studentModel = require("../Models/studentMod");
 const logStudMod = require("../Models/loginMod");
+const systemLogMod=require("../Models/systemLogs");
+
 
 let nameRegex = /^[a-zA-Z ]+$/;
 
@@ -13,12 +15,12 @@ let mobileRegex = /^(?:(?:\+|0{0,2})91(\s*[\-]\s*)?|[0]?)?[6789]\d{9}$/;
 let emailRegex =
   /^[a-z]{1}[a-z0-9._]{1,100}[@]{1}[a-z]{2,15}[.]{1}[a-z]{2,10}$/;
 
-function removeSpaces(x) {
-  return x
-    .split(" ")
-    .filter((y) => y)
-    .join(" ");
-}
+// function removeSpaces(x) {
+//   return x
+//     .split(" ")
+//     .filter((y) => y)
+//     .join(" ");
+// }
 
 const isValid = function (value) {
   if (typeof value == "string" && value.trim().length == 0) {
@@ -131,14 +133,19 @@ module.exports.createStudent = async function (req, res) {
     let Student = await studentModel.create(data);
     let savedData = await studentModel.findOne(Student).select(notShowed);
     let date = new Date();
+    let setFields={StudentId:savedData._id, Event: "Created", TimeStamps:date, Description:"Student has been created" }
+    let addStudent=await systemLogMod.updateOne({StudentId:""},{$set:setFields},{new:true})
+    if(addStudent.studentId!="")  await systemLogMod.create(setFields)
     res
       .status(200)
       .send({
         status: true,
         msg: "Student Added Successfully ✅✅",
         CreatedAt: date.toLocaleString(),
-        data: savedData,
+        data: savedData
       });
+
+
   } catch (error) {
     res.status(500).send({ status: false, error: error.message });
   }
@@ -348,21 +355,32 @@ module.exports.updateStudent = async function (req, res) {
     };
 
     let date = new Date();
-    let update = await studentModel
+    let Update = await studentModel
       .findOneAndUpdate({ _id: studentId }, { $set: temp }, { new: true })
       .select(notShowed);
+
+      let setFields={ Event: "Updated", TimeStamps:date, Description:"Student has been updated" }
+
+      let fields={StudentId:studentId, Event: "Updated", TimeStamps:date, Description:"Student has been updated"}
+
+      let updat=await systemLogMod.findOneAndUpdate({StudentId:studentId},{$set:setFields},{new:true})
+
+if(!updat) await systemLogMod.create(fields)
+      
+
     res
       .status(200)
       .send({
         status: true,
         msg: "Student details updated successfully",
         UpdatedAt: date.toLocaleString(),
-        data: update,
+        data: Update
       });
   } catch (err) {
     res.status(500).send({ status: false, msg: "Error", error: err.message });
   }
 };
+
 
 module.exports.deleteStudent = async function (req, res) {
   try {
@@ -393,6 +411,13 @@ module.exports.deleteStudent = async function (req, res) {
       return res
         .status(404)
         .send({ status: false, message: "No Student found" });
+
+        let setFields={ Event: "Deleted", TimeStamps:date, Description:"Student has been deleted" }
+let fields={StudentId:findStudent._id, Event: "Deleted", TimeStamps:date, Description:"Student has been deleted" }
+
+        let delet = await systemLogMod.findOneAndUpdate({StudentId:findStudent._id},{$set:setFields},{new:true})
+
+        if(!delet) await systemLogMod.create(fields)
 
     return res
       .status(200)
@@ -468,3 +493,17 @@ module.exports.loginDatabase = async function (req, res) {
     res.status(500).send({ status: false, error: error.message });
   }
 };
+
+
+module.exports.SystemLogs = async function(req,res){
+  try{
+let data=req.body
+let {StudentId, Event, TimeStamps, Description}=data
+
+let systemLogs=await systemLogMod.create(data)
+res.status(200).send({status:true,msg:systemLogs})
+  }
+  catch(error){
+    res.status(500).send({status:false,error:error.message})
+  }
+}

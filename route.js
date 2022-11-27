@@ -7,15 +7,16 @@ const studentController=require("../studentMgmt/controller/studentCon")
 
 router.post("/create", studentController.createStudent)
 
-router.put("/students/:studentId", studentController.updateStudent)
+ router.put("/students/:studentId", studentController.updateStudent)
 
 router.get("/getstudents", studentController.getStudents)
-
 
 router.delete("/delete", studentController.deleteStudent)
 
 router.post("/logStud",studentController.loginDatabase)
 
 router.post("/login", studentController.loginStudent)
+
+router.post("/systemLog",studentController.SystemLogs)
 
 module.exports=router
