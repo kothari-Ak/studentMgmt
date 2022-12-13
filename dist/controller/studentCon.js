@@ -25,31 +25,31 @@ module.exports.createStudent = function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             let data = req.body;
-            let { id, Name, Age, Mobile, Email } = data;
+            let { Name, Age, Mobile, Email } = data;
             if (Object.keys(data).length == 0) {
                 return res
                     .status(400)
                     .send({ status: false, msg: "Body should not be Empty.. " });
             }
-            if (!id || typeof id == "undefined" || id == " ") {
-                return res
-                    .status(400)
-                    .send({ status: false, message: "Please enter some id" });
-            }
-            if (typeof id != "number") {
-                return res
-                    .status(400)
-                    .send({ status: false, message: "Please enter valid id" });
-            }
-            if (id) {
-                const checkId = yield client.query(`SELECT * FROM studenttable WHERE id= ($1);`.toLowerCase(), [id]);
-                const arr = checkId.rows;
-                if (arr.length != 0) {
-                    return res.status(400).json({
-                        error: "Please provide some other id...this id has been used ⚠️⚠️"
-                    });
-                }
-            }
+            // if (!id || typeof id == "undefined" || id == " ") {
+            //   return res
+            //     .status(400)
+            //     .send({ status: false, message: "Please enter some id" });
+            // }
+            // if (typeof id != "number") {
+            //   return res
+            //     .status(400)
+            //     .send({ status: false, message: "Please enter valid id" });
+            // }
+            // if (id) {
+            //   const checkId = await client.query(`SELECT * FROM studenttable WHERE id= ($1);`.toLowerCase(), [id]);
+            //   const arr = checkId.rows;
+            //   if (arr.length != 0) {
+            //     return res.status(400).json({
+            //       error: "Please provide some other id...this id has been used ⚠️⚠️"
+            //     });
+            //   }
+            // }
             if (!Name || typeof Name == "undefined" || Name == " ") {
                 return res
                     .status(400)
@@ -112,9 +112,13 @@ module.exports.createStudent = function (req, res) {
                 }
             }
             let date = new Date();
-            let insertQuery = "insert into studenttable(id,Name, Age, Mobile, Email) values($1,lower($2),$3,$4,$5)";
-            yield client.query(insertQuery, [id, Name, Age, Mobile, Email]);
-            let StudentId = id, Event = "Created", TimeStamps = date, Description = "Student has been added";
+            let insertQuery = "insert into studenttable(Name, Age, Mobile, Email) values(lower($1),$2,$3,$4)";
+            yield client.query(insertQuery, [Name, Age, Mobile, Email]);
+            let idQuery = "Select * from studenttable where Mobile = $1;";
+            let qury = yield client.query(idQuery, [Mobile]);
+            let id = Object.values(qury.rows[0]);
+            console.log(id[0]);
+            let StudentId = id[0], Event = "Created", TimeStamps = date, Description = "Student has been added";
             let setFields = "insert into systemlogs(StudentId,Event,TimeStamps, Description) values($1,$2,$3,$4)";
             yield client.query(setFields, [StudentId, Event, TimeStamps, Description]);
             res
@@ -122,7 +126,7 @@ module.exports.createStudent = function (req, res) {
                 .send({
                 status: true,
                 msg: "Student Added Successfully ✅✅",
-                data: { id, Name, Age, Mobile, Email }
+                data: { Name, Age, Mobile, Email }
             });
         }
         catch (error) {
